@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/tools"
+          cd "$HOME/tools"
+          curl -sSLf -o rojo.zip https://github.com/rojo-rbx/rojo/releases/download/v7.4.4/rojo-7.4.4-linux-x86_64.zip
+          curl -sSLf -o stylua.zip https://github.com/JohnnyMorganz/StyLua/releases/download/v2.0.2/stylua-linux-x86_64.zip
+          curl -sSLf -o selene.zip https://github.com/Kampfkarren/selene/releases/download/0.28.0/selene-0.28.0-linux.zip
+          curl -sSLf -o lune.zip https://github.com/lune-org/lune/releases/download/v0.8.9/lune-0.8.9-linux-x86_64.zip
+          for z in *.zip; do unzip -o -q "$z"; done
+          chmod +x rojo stylua selene lune
+          echo "$HOME/tools" >> "$GITHUB_PATH"
+
+      - name: Format
+        run: stylua --check src tests
+
+      - name: Lint
+        run: selene src
+
+      - name: Unit tests
+        run: lune run tests/run
+
+      - name: Build place
+        run: rojo build -o build/FlashlightTag.rbxl

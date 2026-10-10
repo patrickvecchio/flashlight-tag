@@ -1,0 +1,6 @@
+# Tool versions for this project. Run `rokit install` to get them.
+[tools]
+rojo = "rojo-rbx/rojo@7.4.4"
+stylua = "JohnnyMorganz/StyLua@2.0.2"
+selene = "Kampfkarren/selene@0.28.0"
+lune = "lune-org/lune@0.8.9"
