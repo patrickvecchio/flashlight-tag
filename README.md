@@ -29,5 +29,5 @@ These are what CI runs on every pull request:
 stylua --check src tests   # formatting
 selene src                 # lint
 lune run tests/run         # unit tests
-rojo build -o build/FlashlightTag.rbxl
+mkdir -p build && rojo build -o build/FlashlightTag.rbxl
 ```

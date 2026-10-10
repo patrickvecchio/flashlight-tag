@@ -34,4 +34,4 @@ jobs:
         run: lune run tests/run
 
       - name: Build place
-        run: rojo build -o build/FlashlightTag.rbxl
+        run: mkdir -p build && rojo build -o build/FlashlightTag.rbxl
