@@ -1,8 +1,9 @@
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FlashlightController = require(script.Parent.FlashlightController)
+local HudController = require(script.Parent.HudController)
+local LightingController = require(script.Parent.LightingController)
 
-local Remotes = require(ReplicatedStorage.Shared.Remotes)
+LightingController.start()
+FlashlightController.start()
+HudController.start()
 
-Remotes.get(Remotes.Events.RoleAssigned)
-
-print(`[FlashlightTag] Client started for {Players.LocalPlayer.Name}`)
+print("[FlashlightTag] Client started")

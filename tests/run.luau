@@ -7,6 +7,7 @@ local process = require("@lune/process")
 
 local specs = {
 	Cone = require("./Cone.spec"),
+	RoundLogic = require("./RoundLogic.spec"),
 }
 
 local passed, failed = 0, 0

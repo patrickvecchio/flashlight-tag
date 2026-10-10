@@ -10,6 +10,15 @@ The full plan, including the open gameplay decisions, is in the [build plan doc]
 2. Install the Rojo plugin in Roblox Studio: `rojo plugin install`.
 3. Run `rojo serve`, open a new Baseplate in Studio, and click **Connect** in the Rojo plugin. Code changes in `src/` now sync into Studio live.
 
+## Playtesting a round
+
+1. With `rojo serve` running and Studio connected, open the **Test** tab.
+2. Set the player count to **3** and click **Clients and Servers** (a round needs `Config.Queue.MinPlayers` players).
+3. After a 10-second countdown one player becomes the seeker. They see a black screen for 15 seconds while the hiders scatter, then get the flashlight. Aim it with the camera.
+4. A hider in the beam drains from 100 to 0 in 4 seconds and is sent back to the lobby. The round ends when every hider is caught or the 3 minutes run out.
+
+The arena is built from plain parts by `src/server/World.luau`. The game turns off any SpawnLocation it didn't create, so a new Baseplate works as a starting place.
+
 ## Layout
 
 | Folder | Lands in | What goes there |

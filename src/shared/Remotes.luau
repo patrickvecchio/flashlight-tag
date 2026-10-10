@@ -1,6 +1,9 @@
 --[[
 	Names of every remote the client and server use to talk.
 	The server creates them at startup with Remotes.create(); clients get them with Remotes.get().
+
+	Round state, roles and health travel as attributes instead (see Attributes.luau),
+	so a client that joins late still sees the current values.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,10 +13,7 @@ local FOLDER_NAME = "Remotes"
 local Remotes = {}
 
 Remotes.Events = {
-	RoleAssigned = "RoleAssigned", -- server -> client: "Seeker" | "Hider"
-	RoundStateChanged = "RoundStateChanged", -- server -> clients: state name, seconds left
-	HealthChanged = "HealthChanged", -- server -> client: current health
-	Eliminated = "Eliminated", -- server -> client: you were caught
+	Caught = "Caught", -- server -> client: you were caught by the flashlight
 }
 
 Remotes.UnreliableEvents = {

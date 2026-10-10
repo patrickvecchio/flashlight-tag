@@ -36,6 +36,27 @@ local Config = {
 
 	SeekerVision = {
 		RadiusStuds = 8, -- the small circle the seeker can see without the flashlight
+		Brightness = 0.6,
+	},
+
+	-- What hiders (and everyone in the lobby) see: a dim dusk.
+	Dusk = {
+		ClockTime = 19.3,
+		Brightness = 1,
+		Ambient = Color3.fromRGB(45, 45, 70),
+		OutdoorAmbient = Color3.fromRGB(80, 75, 110),
+		FogColor = Color3.fromRGB(40, 40, 65),
+		FogEnd = 350,
+	},
+
+	-- What the seeker sees outside the flashlight beam: nearly nothing.
+	Darkness = {
+		ClockTime = 0,
+		Brightness = 0,
+		Ambient = Color3.new(0, 0, 0),
+		OutdoorAmbient = Color3.new(0, 0, 0),
+		FogColor = Color3.new(0, 0, 0),
+		FogEnd = 80,
 	},
 
 	Scoring = {
