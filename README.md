@@ -1,0 +1,33 @@
+# Flashlight Tag
+
+A Roblox game that mixes Hide and Seek with Tag. Each 3-minute round picks one seeker who is surrounded by darkness and armed with a flashlight; the hiders play in a dusk scene and lose health while the beam is on them.
+
+The full plan, including the open gameplay decisions, is in the [build plan doc](https://claude.ai/code/artifact/ef3d5f77-5eb9-406b-8134-eec61f188c4f).
+
+## Setup
+
+1. Install [Rokit](https://github.com/rojo-rbx/rokit), then run `rokit install` in this folder. It installs the tool versions pinned in `rokit.toml` (Rojo, StyLua, Selene, Lune).
+2. Install the Rojo plugin in Roblox Studio: `rojo plugin install`.
+3. Run `rojo serve`, open a new Baseplate in Studio, and click **Connect** in the Rojo plugin. Code changes in `src/` now sync into Studio live.
+
+## Layout
+
+| Folder | Lands in | What goes there |
+| --- | --- | --- |
+| `src/server` | ServerScriptService.Server | Game rules: queues, rounds, damage |
+| `src/client` | StarterPlayerScripts.Client | Lighting, flashlight input, HUD |
+| `src/shared` | ReplicatedStorage.Shared | Config, remote names, pure helpers |
+| `tests` | not synced | Unit tests for pure modules, run with Lune |
+
+All tunable numbers (round length, damage, group size) are in `src/shared/Config.luau`.
+
+## Checks
+
+These are what CI runs on every pull request:
+
+```sh
+stylua --check src tests   # formatting
+selene src                 # lint
+lune run tests/run         # unit tests
+mkdir -p build && rojo build -o build/FlashlightTag.rbxl
+```
