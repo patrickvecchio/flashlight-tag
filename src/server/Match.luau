@@ -96,6 +96,7 @@ local function clearMatchAttributes(player: Player)
 			Attributes.Winner,
 			Attributes.Standings,
 			Attributes.Score,
+			Attributes.HidersLeft,
 		}
 	do
 		player:SetAttribute(name, nil)
@@ -156,6 +157,7 @@ local function runRound(match: MatchState, players: { Player }, roundNumber: num
 	local totalSeconds = Config.Round.DurationSeconds
 	local hidingSeconds = Config.Round.HidingSeconds
 	for elapsed = 0, hidingSeconds - 1 do
+		setAll(match, Attributes.HidersLeft, #hidersLeft(round))
 		setState(match, States.Hiding, totalSeconds - elapsed)
 		task.wait(1)
 		if round.ended then
@@ -192,6 +194,7 @@ local function runRound(match: MatchState, players: { Player }, roundNumber: num
 		if winner then
 			break
 		end
+		setAll(match, Attributes.HidersLeft, #hidersLeft(round))
 		setState(match, States.Seeking, secondsLeft)
 		task.wait(1)
 		secondsLeft -= 1

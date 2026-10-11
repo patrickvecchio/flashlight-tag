@@ -17,6 +17,8 @@ local Remotes = require(ReplicatedStorage.Shared.Remotes)
 local RoundLogic = require(ReplicatedStorage.Shared.RoundLogic)
 
 local TOOL_NAME = "Flashlight"
+local BEAM_COLOR = Color3.fromRGB(255, 240, 210)
+local BEAM_SPOTTING_COLOR = Color3.fromRGB(255, 150, 120)
 local BEAM_ATTACHMENT_NAME = "FlashlightBeam"
 -- Body parts checked for line of sight; a hider is lit if any of them is visible.
 local TARGET_PARTS = { "Head", "UpperTorso", "Torso", "HumanoidRootPart" }
@@ -76,7 +78,7 @@ function Flashlight.give(seeker: Player)
 	beam.Angle = Config.Flashlight.HalfAngleDegrees * 2
 	beam.Range = Config.Flashlight.RangeStuds
 	beam.Brightness = 6
-	beam.Color = Color3.fromRGB(255, 240, 210)
+	beam.Color = BEAM_COLOR
 	beam.Shadows = true
 	beam.Enabled = false
 	beam.Parent = attachment
@@ -97,6 +99,7 @@ end
 ]=]
 function Flashlight.take(player: Player)
 	aims[player] = nil
+	player:SetAttribute(Attributes.Spotting, nil)
 	local backpack = player:FindFirstChildOfClass("Backpack")
 	for _, container in { player.Character, backpack } do
 		local tool = container and container:FindFirstChild(TOOL_NAME)
@@ -160,6 +163,7 @@ function Flashlight.startDamage(seeker: Player, getHiders: () -> { Player }, onC
 		local seekerCharacter = seeker.Character
 		local aim = aims[seeker]
 		local beamOn = seekerCharacter ~= nil and aim ~= nil and isEquipped(seekerCharacter)
+		local spotting = 0
 
 		for _, hider in getHiders() do
 			local hiderCharacter = hider.Character
@@ -169,6 +173,7 @@ function Flashlight.startDamage(seeker: Player, getHiders: () -> { Player }, onC
 			hider:SetAttribute(Attributes.Lit, lit)
 
 			if lit then
+				spotting += 1
 				local health = hider:GetAttribute(Attributes.LightHealth) or Config.Health.Max
 				health = RoundLogic.drain(health, step, Config.Health.DrainPerSecond)
 				hider:SetAttribute(Attributes.LightHealth, health)
@@ -177,6 +182,13 @@ function Flashlight.startDamage(seeker: Player, getHiders: () -> { Player }, onC
 					onCaught(hider)
 				end
 			end
+		end
+
+		-- The seeker's HUD shows when the beam is on someone, and the beam turns red for everyone.
+		seeker:SetAttribute(Attributes.Spotting, spotting)
+		local beam = seekerCharacter and getBeam(seekerCharacter)
+		if beam then
+			beam.Color = if spotting > 0 then BEAM_SPOTTING_COLOR else BEAM_COLOR
 		end
 	end)
 

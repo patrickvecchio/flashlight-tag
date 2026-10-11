@@ -13,11 +13,13 @@
 		Winner      - "Seeker" or "Hiders" during Results, nil otherwise
 		Standings   - final scores text during MatchResults, nil otherwise
 		Score       - this player's points so far in the match
+		HidersLeft  - hiders still in the current round
 
 	Round state (only while the player is in the arena):
 		Role        - "Seeker" or "Hider"
 		LightHealth - hider health, 0 to Config.Health.Max
 		Lit         - true while the flashlight is on this hider
+		Spotting    - on the seeker: how many hiders the beam is on right now
 ]]
 
 return {
@@ -29,10 +31,12 @@ return {
 	Winner = "Winner",
 	Standings = "Standings",
 	Score = "Score",
+	HidersLeft = "HidersLeft",
 
 	Role = "Role",
 	LightHealth = "LightHealth",
 	Lit = "Lit",
+	Spotting = "Spotting",
 
 	States = {
 		Hiding = "Hiding",
