@@ -11,7 +11,10 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local World = {}
 
 local LOBBY_CENTER = Vector3.new(0, 150, 300)
+local LOBBY_SIZE = Vector3.new(80, 2, 60)
 local ARENA_SIZE = 160
+-- Arenas sit side by side along X, far enough apart that one match can't see into another.
+local ARENA_SPACING = 400
 local WALL_HEIGHT = 24
 
 -- Cover for hiders: { size, position (centre, y = floor level), colour }.
@@ -66,15 +69,25 @@ local function part(props: { [string]: any }, parent: Instance): Part
 	return p
 end
 
-local function buildArena(parent: Instance)
+export type Arena = {
+	index: number,
+	origin: Vector3,
+}
+
+local function arenaOrigin(index: number): Vector3
+	return Vector3.new((index - 1) * ARENA_SPACING, 0, 0)
+end
+
+local function buildArena(parent: Instance, index: number)
+	local origin = arenaOrigin(index)
 	local arena = Instance.new("Model")
-	arena.Name = "Arena"
+	arena.Name = `Arena{index}`
 
 	local floorTop = 1
 	part({
 		Name = "Floor",
 		Size = Vector3.new(ARENA_SIZE, 1, ARENA_SIZE),
-		Position = Vector3.new(0, floorTop - 0.5, 0),
+		Position = origin + Vector3.new(0, floorTop - 0.5, 0),
 		Material = Enum.Material.Grass,
 		Color = Color3.fromRGB(45, 70, 40),
 	}, arena)
@@ -92,7 +105,7 @@ local function buildArena(parent: Instance)
 		part({
 			Name = "BoundaryWall",
 			Size = wall[1],
-			Position = wall[2],
+			Position = origin + wall[2],
 			Material = Enum.Material.Brick,
 			Color = Color3.fromRGB(70, 60, 60),
 		}, arena)
@@ -106,7 +119,7 @@ local function buildArena(parent: Instance)
 		part({
 			Name = "Cover",
 			Size = size,
-			Position = Vector3.new(base.X, floorTop + base.Y + size.Y / 2, base.Z),
+			Position = origin + Vector3.new(base.X, floorTop + base.Y + size.Y / 2, base.Z),
 			Material = Enum.Material.Wood,
 			Color = color,
 		}, cover)
@@ -121,7 +134,7 @@ local function buildLobby(parent: Instance)
 
 	part({
 		Name = "Floor",
-		Size = Vector3.new(60, 2, 60),
+		Size = LOBBY_SIZE,
 		Position = LOBBY_CENTER - Vector3.new(0, 1, 0),
 		Material = Enum.Material.SmoothPlastic,
 		Color = Color3.fromRGB(60, 60, 75),
@@ -129,10 +142,10 @@ local function buildLobby(parent: Instance)
 
 	for _, rail in
 		{
-			{ Vector3.new(60, 6, 1), Vector3.new(0, 3, -30) },
-			{ Vector3.new(60, 6, 1), Vector3.new(0, 3, 30) },
-			{ Vector3.new(1, 6, 60), Vector3.new(-30, 3, 0) },
-			{ Vector3.new(1, 6, 60), Vector3.new(30, 3, 0) },
+			{ Vector3.new(LOBBY_SIZE.X, 6, 1), Vector3.new(0, 3, -LOBBY_SIZE.Z / 2) },
+			{ Vector3.new(LOBBY_SIZE.X, 6, 1), Vector3.new(0, 3, LOBBY_SIZE.Z / 2) },
+			{ Vector3.new(1, 6, LOBBY_SIZE.Z), Vector3.new(-LOBBY_SIZE.X / 2, 3, 0) },
+			{ Vector3.new(1, 6, LOBBY_SIZE.Z), Vector3.new(LOBBY_SIZE.X / 2, 3, 0) },
 		}
 	do
 		part({
@@ -150,7 +163,7 @@ local function buildLobby(parent: Instance)
 	spawn.Neutral = true
 	spawn.Duration = 0
 	spawn.Size = Vector3.new(8, 1, 8)
-	spawn.Position = LOBBY_CENTER + Vector3.new(0, 0.5, 0)
+	spawn.Position = LOBBY_CENTER + Vector3.new(0, 0.5, 18)
 	spawn.Color = Color3.fromRGB(90, 90, 140)
 	spawn.Parent = lobby
 
@@ -172,7 +185,20 @@ local function applyDusk()
 	Lighting.FogEnd = dusk.FogEnd
 end
 
-function World.build()
+--[=[
+	Where pad `index` of `count` sits on the lobby floor, spaced evenly across the north side.
+]=]
+function World.padPosition(index: number, count: number): Vector3
+	local spacing = LOBBY_SIZE.X / (count + 1)
+	local x = -LOBBY_SIZE.X / 2 + spacing * index
+	return LOBBY_CENTER + Vector3.new(x, 0, -10)
+end
+
+function World.lobbyFolder(): Instance
+	return workspace:WaitForChild("FlashlightTag"):WaitForChild("Lobby")
+end
+
+function World.build(arenaCount: number)
 	-- Only our lobby spawn should place players, so turn off any spawns the place already had
 	-- (a new Baseplate comes with one in the middle of where the arena goes).
 	for _, existing in workspace:GetDescendants() do
@@ -183,7 +209,9 @@ function World.build()
 
 	local root = Instance.new("Folder")
 	root.Name = "FlashlightTag"
-	buildArena(root)
+	for index = 1, arenaCount do
+		buildArena(root, index)
+	end
 	buildLobby(root)
 	root.Parent = workspace
 
@@ -198,18 +226,18 @@ local function teleport(player: Player, position: Vector3)
 end
 
 function World.sendToLobby(player: Player)
-	local offset = Vector3.new(math.random(-12, 12), 0, math.random(-12, 12))
+	local offset = Vector3.new(math.random(-20, 20), 0, math.random(8, 24))
 	teleport(player, LOBBY_CENTER + offset)
 end
 
-function World.sendToSeekerSpawn(player: Player)
-	teleport(player, SEEKER_SPAWN + Vector3.new(0, 1, 0))
+function World.sendToSeekerSpawn(arena: Arena, player: Player)
+	teleport(player, arena.origin + SEEKER_SPAWN + Vector3.new(0, 1, 0))
 end
 
 --[=[
 	Sends each hider to a different spawn point, reusing them only if there are more hiders than spawns.
 ]=]
-function World.sendToHiderSpawns(hiders: { Player })
+function World.sendToHiderSpawns(arena: Arena, hiders: { Player })
 	local order = table.clone(HIDER_SPAWNS)
 	for i = #order, 2, -1 do
 		local j = math.random(1, i)
@@ -217,8 +245,12 @@ function World.sendToHiderSpawns(hiders: { Player })
 	end
 	for index, hider in hiders do
 		local spawnPoint = order[(index - 1) % #order + 1]
-		teleport(hider, spawnPoint + Vector3.new(0, 1, 0))
+		teleport(hider, arena.origin + spawnPoint + Vector3.new(0, 1, 0))
 	end
+end
+
+function World.arena(index: number): Arena
+	return { index = index, origin = arenaOrigin(index) }
 end
 
 return World

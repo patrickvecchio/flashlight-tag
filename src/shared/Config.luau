@@ -8,12 +8,15 @@ local Config = {
 		MinPlayers = 3, -- 1 seeker + 2 hiders
 		MaxPlayers = 8,
 		CountdownSeconds = 10,
+		-- One lobby pad per arena; each pad runs its own match.
+		Pads = 2,
 	},
 
 	Match = {
 		RoundsPerMatch = 3,
 		-- Caught hiders wait in the lobby and rejoin for the next round.
 		CaughtHidersRejoinNextRound = true,
+		ResultsSeconds = 8, -- final standings before everyone returns to the lobby
 	},
 
 	Round = {
