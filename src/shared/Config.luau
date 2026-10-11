@@ -62,6 +62,17 @@ local Config = {
 		FogEnd = 80,
 	},
 
+	-- Sound ids. These are sounds that ship with Roblox; swap in any audio from the Creator Store.
+	Sounds = {
+		Tick = "rbxasset://sounds/clickfast.wav", -- last seconds of the hiding countdown
+		Release = "rbxasset://sounds/electronicpingshort.wav", -- the seeker is released
+		Toggle = "rbxasset://sounds/clickfast.wav", -- flashlight on/off
+		Heartbeat = "rbxasset://sounds/clickfast.wav", -- repeats, slowed down, while you are lit
+		Caught = "rbxasset://sounds/uuhhh.mp3",
+		RoundEnd = "rbxasset://sounds/electronicpingshort.wav",
+		Whoosh = "rbxasset://sounds/swoosh.wav", -- sent to the lobby or the arena
+	},
+
 	Scoring = {
 		PerHiderCaught = 10,
 		PerHiderSurvived = 10,

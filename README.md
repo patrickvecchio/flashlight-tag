@@ -21,14 +21,36 @@ The full plan, including the open gameplay decisions, is in the [build plan doc]
 
 There are two pads, each with its own arena, so two groups can play at once (try 6 players). Scoring: the seeker gets 10 points per hider caught, and each hider still hidden when time runs out gets 10.
 
-The arenas and lobby are built from plain parts by `src/server/World.luau`. The game turns off any SpawnLocation it didn't create, so a new Baseplate works as a starting place.
+Test on a phone by picking a device in Studio's **Test > Device** emulator, and on a gamepad by plugging one in.
+
+## Controls
+
+| | Keyboard and mouse | Gamepad | Phone |
+| --- | --- | --- | --- |
+| Aim the flashlight (seeker) | Move the camera; the beam points at the middle of the screen | Right stick | Drag on the screen |
+| Flashlight on/off (seeker) | F | X | The LIGHT button |
+| Join or leave a group pad | E | The prompt's button | Tap the prompt |
+
+## The arena map
+
+The built-in arena is a small neighborhood (two houses, a garage, a playground, a street with parked cars, trees, hedges and fences), built from parts by `src/server/ArenaMap.luau`. The lobby is built by `src/server/World.luau`. The game turns off any SpawnLocation it didn't create, so a new Baseplate works as a starting place.
+
+To use your own map from Studio instead:
+
+1. Build it centred on the origin (0, 0, 0), with walls around the edge to keep players in, and keep it under 400 studs wide so the copies for each pad don't overlap.
+2. Add one part named `SeekerSpawn` and several named `HiderSpawn` where players should start. They are hidden when the game runs.
+3. Group it into a Model named `ArenaMap` and put it in **ServerStorage**. Each pad gets its own copy.
+
+## Sounds
+
+Sound ids live in `Config.Sounds`. They currently point at sounds that ship with Roblox as placeholders; swap in anything from the Creator Store.
 
 ## Layout
 
 | Folder | Lands in | What goes there |
 | --- | --- | --- |
 | `src/server` | ServerScriptService.Server | Game rules: queues, rounds, damage |
-| `src/client` | StarterPlayerScripts.Client | Lighting, flashlight input, HUD |
+| `src/client` | StarterPlayerScripts.Client | Lighting, flashlight controls, sounds and effects, HUD |
 | `src/shared` | ReplicatedStorage.Shared | Config, remote names, pure helpers |
 | `tests` | not synced | Unit tests for pure modules, run with Lune |
 
