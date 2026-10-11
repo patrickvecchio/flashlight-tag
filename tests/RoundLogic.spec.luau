@@ -42,4 +42,23 @@ return {
 		assert(RoundLogic.formatTime(0.2) == "0:01", "expected 0:01")
 		assert(RoundLogic.formatTime(-3) == "0:00", "expected 0:00")
 	end,
+
+	["seekerCandidates skips players who already sought"] = function()
+		local candidates = RoundLogic.seekerCandidates({ "a", "b", "c" }, { a = true })
+		assert(#candidates == 2 and candidates[1] == "b" and candidates[2] == "c", "expected b and c")
+	end,
+
+	["seekerCandidates starts over once everyone has sought"] = function()
+		local candidates = RoundLogic.seekerCandidates({ "a", "b" }, { a = true, b = true })
+		assert(#candidates == 2, "expected everyone again")
+	end,
+
+	["formatStandings sorts by score then name"] = function()
+		local text = RoundLogic.formatStandings({
+			{ name = "Cam", score = 10 },
+			{ name = "Ann", score = 20 },
+			{ name = "Bo", score = 10 },
+		})
+		assert(text == "1. Ann  20\n2. Bo  10\n3. Cam  10", `got {text}`)
+	end,
 }

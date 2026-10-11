@@ -1,6 +1,7 @@
 --[[
-	A plain HUD for playtesting: round timer and status, your role, a hider health bar,
-	a red edge while you are in the beam, and a black screen for the seeker while hiders hide.
+	A plain HUD for playtesting: lobby and round status, your role and score, a hider health
+	bar, a red edge while you are in the beam, a black screen for the seeker while hiders hide,
+	and the final standings at the end of a match.
 	Phase 4 replaces this with a designed one.
 ]]
 
@@ -116,26 +117,53 @@ function HudController.start()
 		ZIndex = 6,
 	}, gui)
 
+	local score = label({
+		Name = "Score",
+		Size = UDim2.new(0, 160, 0, 26),
+		Position = UDim2.new(1, -176, 0, 48),
+		TextXAlignment = Enum.TextXAlignment.Right,
+		ZIndex = 4,
+	}, gui)
+
+	local standings = label({
+		Name = "Standings",
+		Size = UDim2.new(0.3, 0, 0.4, 0),
+		Position = UDim2.fromScale(0.35, 0.3),
+		BackgroundTransparency = 0.3,
+		BackgroundColor3 = Color3.fromRGB(20, 20, 30),
+		TextScaled = false,
+		TextSize = 24,
+		TextYAlignment = Enum.TextYAlignment.Top,
+		Visible = false,
+		ZIndex = 6,
+	}, gui)
+
 	gui.Parent = player:WaitForChild("PlayerGui")
 
 	local function update()
-		local state = ReplicatedStorage:GetAttribute(Attributes.RoundState)
-		local seconds = ReplicatedStorage:GetAttribute(Attributes.SecondsLeft) or 0
+		local state = player:GetAttribute(Attributes.RoundState)
+		local seconds = player:GetAttribute(Attributes.SecondsLeft) or 0
+		local roundNumber = player:GetAttribute(Attributes.RoundNumber) or 1
 		local myRole = player:GetAttribute(Attributes.Role)
 		local health = player:GetAttribute(Attributes.LightHealth)
+		local myScore = player:GetAttribute(Attributes.Score)
+		local pad = player:GetAttribute(Attributes.Pad)
+		local roundText = `Round {roundNumber} of {Config.Match.RoundsPerMatch}`
 
-		if state == States.Waiting then
-			status.Text = `Waiting for players ({#Players:GetPlayers()}/{Config.Queue.MinPlayers})`
-		elseif state == States.Countdown then
-			status.Text = `Round starts in {seconds}`
+		if player:GetAttribute(Attributes.MatchId) == nil then
+			status.Text = if pad
+				then `In group {pad}. Waiting for players...`
+				else "Walk up to a group pad to join a game"
 		elseif state == States.Hiding then
-			status.Text =
-				`Hide! Seeker released in {seconds - (Config.Round.DurationSeconds - Config.Round.HidingSeconds)}`
+			local release = seconds - (Config.Round.DurationSeconds - Config.Round.HidingSeconds)
+			status.Text = `{roundText}: hide! Seeker released in {release}`
 		elseif state == States.Seeking then
-			status.Text = RoundLogic.formatTime(seconds)
+			status.Text = `{roundText}  {RoundLogic.formatTime(seconds)}`
 		elseif state == States.Results then
-			local winner = ReplicatedStorage:GetAttribute(Attributes.Winner)
-			status.Text = if winner == "Seeker" then "The seeker wins!" else "The hiders win!"
+			local winner = player:GetAttribute(Attributes.Winner)
+			status.Text = if winner == "Seeker" then "The seeker wins the round!" else "The hiders win the round!"
+		elseif state == States.MatchResults then
+			status.Text = "Match over"
 		else
 			status.Text = ""
 		end
@@ -148,6 +176,14 @@ function HudController.start()
 			role.Text = ""
 		end
 
+		score.Text = if typeof(myScore) == "number" then `Score: {myScore}` else ""
+
+		local standingsText = player:GetAttribute(Attributes.Standings)
+		standings.Visible = state == States.MatchResults and typeof(standingsText) == "string"
+		if typeof(standingsText) == "string" then
+			standings.Text = `Final scores\n\n{standingsText}`
+		end
+
 		blindness.Visible = myRole == Roles.Seeker and state == States.Hiding
 		healthBack.Visible = myRole == Roles.Hider and typeof(health) == "number"
 		if typeof(health) == "number" then
@@ -156,14 +192,7 @@ function HudController.start()
 		litEdge.Visible = player:GetAttribute(Attributes.Lit) == true
 	end
 
-	for _, name in { Attributes.RoundState, Attributes.SecondsLeft, Attributes.Winner } do
-		ReplicatedStorage:GetAttributeChangedSignal(name):Connect(update)
-	end
-	for _, name in { Attributes.Role, Attributes.LightHealth, Attributes.Lit } do
-		player:GetAttributeChangedSignal(name):Connect(update)
-	end
-	Players.PlayerAdded:Connect(update)
-	Players.PlayerRemoving:Connect(update)
+	player.AttributeChanged:Connect(update)
 	update()
 
 	local caughtRemote = Remotes.get(Remotes.Events.Caught) :: RemoteEvent

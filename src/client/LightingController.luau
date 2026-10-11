@@ -52,7 +52,7 @@ local function setAura(enabled: boolean)
 end
 
 local function isInDarkness(): boolean
-	local state = ReplicatedStorage:GetAttribute(Attributes.RoundState)
+	local state = player:GetAttribute(Attributes.RoundState)
 	return player:GetAttribute(Attributes.Role) == Attributes.Roles.Seeker
 		and (state == Attributes.States.Hiding or state == Attributes.States.Seeking)
 end
@@ -79,7 +79,7 @@ end
 
 function LightingController.start()
 	player:GetAttributeChangedSignal(Attributes.Role):Connect(update)
-	ReplicatedStorage:GetAttributeChangedSignal(Attributes.RoundState):Connect(update)
+	player:GetAttributeChangedSignal(Attributes.RoundState):Connect(update)
 	player.CharacterAdded:Connect(function(character)
 		character:WaitForChild("HumanoidRootPart")
 		update()
