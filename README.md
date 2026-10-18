@@ -35,11 +35,17 @@ Test on a phone by picking a device in Studio's **Test > Device** emulator, and 
 
 The built-in arena is a small neighborhood (two houses, a garage, a playground, a street with parked cars, trees, hedges and fences), built from parts by `src/server/ArenaMap.luau`. The lobby is built by `src/server/World.luau`. The game turns off any SpawnLocation it didn't create, so a new Baseplate works as a starting place.
 
-To use your own map from Studio instead:
+The map the game plays is `assets/ArenaMap.rbxmx`, which Rojo syncs into **ServerStorage** as `ArenaMap`. Each pad gets its own copy. It starts as an export of the built-in neighborhood, so it's ready to edit in Studio.
 
-1. Build it centred on the origin (0, 0, 0), with walls around the edge to keep players in, and keep it under 400 studs wide so the copies for each pad don't overlap.
-2. Add one part named `SeekerSpawn` and several named `HiderSpawn` where players should start. They are hidden when the game runs.
-3. Group it into a Model named `ArenaMap` and put it in **ServerStorage**. Each pad gets its own copy.
+To change the map:
+
+1. With `rojo serve` connected, open **ServerStorage > ArenaMap** in Studio and edit it, or replace it with a map of your own.
+2. Keep it centred on the origin (0, 0, 0), with walls around the edge to keep players in, and under 400 studs wide so the copies for each pad don't overlap.
+3. Keep one part named `SeekerSpawn` and several named `HiderSpawn` where players should start (the red and blue pads). They are hidden when the game runs.
+4. Right-click **ArenaMap** > **Save to File...**, choose the XML format (`.rbxmx`), and overwrite `assets/ArenaMap.rbxmx` in this repo. Rojo doesn't copy Studio edits back to files, so this step is what saves them.
+5. Commit the file.
+
+If the file is missing or has no spawn parts, the game warns in Output and uses the built-in map from `src/server/ArenaMap.luau`. To start over from that built-in map, run `lune run scripts/export-map`, which overwrites `assets/ArenaMap.rbxmx`.
 
 ## Sounds
 
@@ -52,6 +58,8 @@ Sound ids live in `Config.Sounds`. They currently point at sounds that ship with
 | `src/server` | ServerScriptService.Server | Game rules: queues, rounds, damage |
 | `src/client` | StarterPlayerScripts.Client | Lighting, flashlight controls, sounds and effects, HUD |
 | `src/shared` | ReplicatedStorage.Shared | Config, remote names, pure helpers |
+| `assets` | ServerStorage | The arena map, `ArenaMap.rbxmx` |
+| `scripts` | not synced | `export-map`, which regenerates the map file from the built-in map |
 | `tests` | not synced | Unit tests for pure modules, run with Lune |
 
 All tunable numbers (round length, damage, group size) are in `src/shared/Config.luau`.
@@ -61,7 +69,7 @@ All tunable numbers (round length, damage, group size) are in `src/shared/Config
 These are what CI runs on every pull request:
 
 ```sh
-stylua --check src tests   # formatting
+stylua --check src tests scripts   # formatting
 selene src                 # lint
 lune run tests/run         # unit tests
 mkdir -p build && rojo build -o build/FlashlightTag.rbxl

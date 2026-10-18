@@ -25,7 +25,7 @@ jobs:
           echo "$HOME/tools" >> "$GITHUB_PATH"
 
       - name: Format
-        run: stylua --check src tests
+        run: stylua --check src tests scripts
 
       - name: Lint
         run: selene src
