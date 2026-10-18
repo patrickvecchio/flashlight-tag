@@ -12,6 +12,12 @@
 				"$path": "src/server"
 			}
 		},
+		"ServerStorage": {
+			"$ignoreUnknownInstances": true,
+			"ArenaMap": {
+				"$path": "assets/ArenaMap.rbxmx"
+			}
+		},
 		"StarterPlayer": {
 			"StarterPlayerScripts": {
 				"Client": {

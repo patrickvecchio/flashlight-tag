@@ -1,10 +1,11 @@
 --[[
 	Builds the lobby and one arena per pad, and sets the dusk lighting.
 
-	Arenas use the built-in neighborhood from ArenaMap.luau. To use a map built in Studio
-	instead, put a Model named "ArenaMap" in ServerStorage, centred on the origin, containing
-	parts named "SeekerSpawn" and "HiderSpawn" (as many hider spawns as you like). Those
-	spawn parts are hidden when the game starts. The map needs its own walls to keep players in.
+	Arenas are copies of ServerStorage.ArenaMap, which Rojo syncs from assets/ArenaMap.rbxmx.
+	It is a Model centred on the origin, containing parts named "SeekerSpawn" and "HiderSpawn"
+	(as many hider spawns as you like). Those spawn parts are hidden when the game starts. The
+	map needs its own walls to keep players in. Without a usable ServerStorage.ArenaMap, arenas
+	fall back to the neighborhood built in code by ArenaMap.luau.
 ]]
 
 local Lighting = game:GetService("Lighting")

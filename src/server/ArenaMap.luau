@@ -5,7 +5,8 @@
 	fences and dark streetlamps, inside a walled 160 x 160 stud lot. Everything is placed
 	relative to the arena's origin, so several copies can sit side by side.
 
-	To use a map built in Studio instead, see World.luau (ServerStorage.ArenaMap).
+	The game normally plays assets/ArenaMap.rbxmx instead (see World.luau); this is the fallback,
+	and `lune run scripts/export-map` regenerates that file from it.
 ]]
 
 local ArenaMap = {}
