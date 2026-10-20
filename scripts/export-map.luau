@@ -1,8 +1,8 @@
 --[[
-	Writes the built-in neighborhood (src/server/ArenaMap.luau) to assets/ArenaMap.rbxmx, with
+	Writes the built-in neighborhood (src/server/ArenaMap.luau) to assets/StarterArenaMap.rbxmx, with
 	SeekerSpawn and HiderSpawn parts added, as a starting point for editing the map in Studio.
 
-	Run it with `lune run scripts/export-map`. It overwrites assets/ArenaMap.rbxmx, so only run
+	Run it with `lune run scripts/export-map`. It overwrites assets/StarterArenaMap.rbxmx, so only run
 	it when you want to start over from the built-in map.
 ]]
 
@@ -11,7 +11,7 @@ local luau = require("@lune/luau")
 local roblox = require("@lune/roblox")
 
 local SOURCE = "src/server/ArenaMap.luau"
-local OUTPUT = "assets/ArenaMap.rbxmx"
+local OUTPUT = "assets/StarterArenaMap.rbxmx"
 
 -- ArenaMap.luau uses Roblox globals, so load it with Lune's versions of them
 local environment = setmetatable({

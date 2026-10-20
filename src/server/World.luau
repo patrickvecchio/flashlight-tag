@@ -1,8 +1,8 @@
 --[[
 	Builds the lobby and one arena per pad, and sets the dusk lighting.
 
-	Arenas are copies of ServerStorage.ArenaMap, which Rojo syncs from assets/ArenaMap.rbxmx.
-	It is a Model centred on the origin, containing parts named "SeekerSpawn" and "HiderSpawn"
+	Arenas are copies of ServerStorage.ArenaMap, which lives in the Studio place (not in this
+	repo, and Rojo leaves ServerStorage alone). It is a Model centred on the origin, containing parts named "SeekerSpawn" and "HiderSpawn"
 	(as many hider spawns as you like). Those spawn parts are hidden when the game starts. The
 	map needs its own walls to keep players in. Without a usable ServerStorage.ArenaMap, arenas
 	fall back to the neighborhood built in code by ArenaMap.luau.
